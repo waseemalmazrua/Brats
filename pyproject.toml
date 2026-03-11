@@ -4,4 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "bentoml>=1.4.36",
+    "mlflow>=3.10.1",
+    "monai>=1.5.2",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "torch>=2.10.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.5",
+]
