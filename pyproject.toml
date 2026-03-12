@@ -5,7 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "auth0-fastapi-api>=1.0.0b5",
     "bentoml>=1.4.36",
+    "fastapi>=0.115.14",
     "mlflow>=3.10.1",
     "monai>=1.5.2",
     "pydantic>=2.12.5",
