@@ -418,6 +418,7 @@ dependencies = [
     { name = "monai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "sqlalchemy" },
     { name = "torch" },
 ]
 
@@ -435,6 +436,7 @@ requires-dist = [
     { name = "monai", specifier = ">=1.5.2" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydantic-settings", specifier = ">=2.13.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.48" },
     { name = "torch", specifier = ">=2.10.0" },
 ]
 
