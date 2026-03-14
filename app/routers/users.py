@@ -1,11 +1,13 @@
-from fastapi import APIRouter , Depends
-from app.core.security import auth
+from fastapi import APIRouter, Depends
+from app.deps.auth import get_current_user
+from app.models.user import User
 
 router = APIRouter(
     prefix="/users",
-    tags=["users"])
+    tags=["users"]
+)
+
 
 @router.get("/me")
-def login(claims : dict = Depends(auth.require_auth())):
-    return claims
-
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
