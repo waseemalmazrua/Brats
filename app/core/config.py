@@ -1,4 +1,4 @@
-from pydantic import BaseSettings , SettingConfigDict
+from pydantic_settings import BaseSettings , SettingsConfigDict
 
 
 class Setting(BaseSettings):
@@ -9,6 +9,6 @@ class Setting(BaseSettings):
     AUTH0_DOMAIN: str
     AUTH0_AUDIENCE: str
 
-    model_config = SettingConfigDict(env_file=".env", env_file_encoding="utf-8",casesenstive=False , extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8",casesenstive=False , extra="ignore")
 
 settings = Setting()
