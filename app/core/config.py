@@ -5,6 +5,7 @@ class Setting(BaseSettings):
 
 
     DATABASE_URL: str
+    ALGORITHM: str
 
     AUTH0_DOMAIN: str
     AUTH0_AUDIENCE: str

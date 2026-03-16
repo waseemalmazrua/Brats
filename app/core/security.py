@@ -1,11 +1,31 @@
-from auth0_fastapi_api import Auth0FastAPI # type: ignore
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer
+from jose import jwt
+import requests
+
 from app.core.config import settings
 
 
-# Initialize the Auth0 validator
-# It automatically handles token extraction and signature verification
-auth = Auth0FastAPI(
-    domain=settings.AUTH0_AUDIENCE,
-    audience=settings.AUTH0_AUDIENCE
+security = HTTPBearer()
 
-)
+
+jwks = requests.get(
+    f"https://{settings.AUTH0_DOMAIN}/.well-known/jwks.json"
+).json()
+
+
+def veriy_token(token=Depends(security)):
+
+    try:
+        payload = jwt.decode(
+            token.credentials,
+            jwks,
+            algorithms=[settings.ALGORITHM],
+            audience=settings.AUTH0_AUDIENCE,
+            issuer=f"https://{settings.AUTH0_DOMAIN}/"
+        )
+
+        return payload
+
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
