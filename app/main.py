@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.routers import users
-from app.db.base import Base
-from app.db.session import engine
+from app.routers import login
 
 app = FastAPI()
 
@@ -12,6 +11,7 @@ def health_check():
 
 
 app.include_router(users.router)
+app.include_router(login.router)
 
 
 # Base.metadata.create_all(bind=engine)

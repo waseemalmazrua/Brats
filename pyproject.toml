@@ -13,7 +13,7 @@ dependencies = [
     "mlflow>=3.10.1",
     "monai>=1.5.2",
     "psycopg2-binary>=2.9.11",
-    "pydantic>=2.12.5",
+    "pydantic[email]>=2.12.5",
     "pydantic-settings>=2.13.1",
     "python-jose>=3.5.0",
     "python-multipart>=0.0.22",
@@ -27,3 +27,34 @@ dependencies = [
 dev = [
     "ruff>=0.15.5",
 ]
+
+# ======================
+# RUFF CONFIG
+# ======================
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # errors
+    "F",   # pyflakes
+    "I",   # import sorting
+    "B",   # bugbear
+    "C4",  # comprehensions
+    "UP",  # python upgrade
+]
+ignore = [
+    "E501"
+]
+
+fix = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
