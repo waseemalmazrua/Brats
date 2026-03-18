@@ -10,6 +10,9 @@ class Setting(BaseSettings):
 
     MLFLOW_MODEL_URI: str
     BENTO_MODEL_NAME : str
+    MLFLOW_TRACKING_URI: str
+
+    GOOGLE_APPLICATION_CREDENTIALS: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", casesenstive=False, extra="ignore"

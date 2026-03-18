@@ -21,6 +21,9 @@ dependencies = [
     "sqlalchemy>=2.0.48",
     "torch>=2.10.0",
     "uvicorn>=0.34.3",
+    "google-cloud-storage>=3.9.0",
+    "nibabel>=5.4.2",
+    "tqdm>=4.67.3",
 ]
 
 [dependency-groups]
