@@ -10,7 +10,7 @@ dependencies = [
     "bentoml>=1.4.36",
     "fastapi>=0.115.14",
     "httpx>=0.28.1",
-    "mlflow>=3.10.1",
+    "mlflow==3.10.0",
     "monai>=1.5.2",
     "psycopg2-binary>=2.9.11",
     "pydantic[email]>=2.12.5",
@@ -22,7 +22,7 @@ dependencies = [
     "torch>=2.10.0",
     "uvicorn>=0.34.3",
     "google-cloud-storage>=3.9.0",
-    "nibabel>=5.4.2",
+    "nibabel==5.3.3",
     "tqdm>=4.67.3",
 ]
 

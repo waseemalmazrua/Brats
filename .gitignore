@@ -23,3 +23,22 @@ Thumbs.db
 
 # logs
 *.log
+
+
+# data
+data/
+*.nii
+*.nii.gz
+outputs/
+
+# =========================
+# MLflow
+# =========================
+mlflow.db
+mlruns/
+
+# =========================
+# Outputs (model results)
+# =========================
+output/
+outputs/

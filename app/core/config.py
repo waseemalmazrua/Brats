@@ -12,6 +12,8 @@ class Setting(BaseSettings):
     BENTO_MODEL_NAME : str
     MLFLOW_TRACKING_URI: str
 
+    BENTOML_MODEL_TAG: str
+
     GOOGLE_APPLICATION_CREDENTIALS: str
 
     model_config = SettingsConfigDict(
