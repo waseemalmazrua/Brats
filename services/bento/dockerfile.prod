@@ -1,0 +1,35 @@
+# =========================
+# 🧱 Stage 1: Builder
+# =========================
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04 AS builder
+
+WORKDIR /app
+
+# system deps
+RUN apt-get update && apt-get install -y python3-pip
+
+# install uv
+RUN pip install uv
+
+# install dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
+
+# =========================
+# 🚀 Stage 2: Runtime
+# =========================
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+
+WORKDIR /app
+
+# نسخ البيئة فقط (🔥 أهم نقطة)
+COPY --from=builder /app/.venv /app/.venv
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+# نسخ الكود
+COPY . /app
+
+EXPOSE 3000
+
+CMD ["bentoml", "serve", "services.bento.service:BratsService", "--production"]

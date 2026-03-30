@@ -1,39 +1,53 @@
-# app/services/brats_service.py
 import bentoml
 import json
 import nibabel as nib
 import numpy as np
 from pathlib import Path
+from typing import Optional
+import torch
+import mlflow.pyfunc
 
 from app.core.config import settings
 from app.core.modality_detector import (
     detect_modalities_from_folder,
     validate_modalities,
 )
-from app.schemas.models import InputData, OutputData
+from app.schemas.models import OutputData
 
 
-@bentoml.service
+@bentoml.service(
+    traffic={"timeout": 300}
+)
 class BratsService:
 
     def __init__(self):
-        model_ref = bentoml.mlflow.get(settings.BENTOML_MODEL_TAG)
-        self.model = model_ref.load_model()
+        self.model = mlflow.pyfunc.load_model(
+            settings.MLFLOW_MODEL_URI
+        )
 
-    @bentoml.api
-    def predict(self, data: InputData) -> OutputData:
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        # ── 1. التحقق من المسار ──
-        folder = Path(data.folder_path)
+        # 🔥 انتبه: pyfunc model غالبًا ما يدعم .to()
+        if hasattr(self.model, "to"):
+            self.model.to(self.device)
+
+        if hasattr(self.model, "eval"):
+            self.model.eval()
+
+        print(f"🚀 Model running on: {self.device}")
+
+    @bentoml.api()
+    def predict(self, folder_path: str, case_id: Optional[str] = None) -> OutputData:
+
+        folder = Path(folder_path)
 
         if not folder.exists():
             raise ValueError(f"المسار غير موجود: {folder}")
         if not folder.is_dir():
             raise ValueError(f"المسار ليس folder: {folder}")
 
-        case_id = data.case_id or folder.name
+        case_id = case_id or folder.name
 
-        # ── 2. اكتشاف الـ modalities تلقائياً ──
         modalities = detect_modalities_from_folder(str(folder))
         validate_modalities(modalities)
 
@@ -44,19 +58,17 @@ class BratsService:
             modalities["flair"],
         ]
 
-        # ── 3. تشغيل الموديل ──
-        result = self.model.predict({"image": image_paths})
+        # 🔥 inference
+        with torch.no_grad():
+            result = self.model.predict({"image": image_paths})
 
-        # ── 4. حفظ النتائج ──
         output_dir = Path("output")
         output_dir.mkdir(exist_ok=True)
 
-        # JSON report
         json_path = output_dir / f"{case_id}_report.json"
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(result["report"], f, indent=4, ensure_ascii=False)
 
-        # NIfTI segmentation — نفس الـ affine والـ header من T1 الأصلي
         ref_img   = nib.load(image_paths[1])
         seg_array = np.asarray(result["segmentation"]).astype(np.uint8)
         seg_img   = nib.Nifti1Image(seg_array, affine=ref_img.affine, header=ref_img.header)

@@ -1,0 +1,46 @@
+# =========================
+# 🧱 Stage 1: Builder
+# =========================
+FROM python:3.10-slim AS builder
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# تثبيت uv
+RUN pip install --no-cache-dir uv
+
+# نسخ dependencies فقط
+COPY pyproject.toml uv.lock* ./
+
+# تثبيت كل dependencies (بدون cache)
+# تثبيت dependencies بدون torch أولاً
+RUN uv sync --frozen --no-cache && \
+    rm -rf /root/.cache
+
+
+# =========================
+# 🚀 Stage 2: Runtime
+# =========================
+FROM python:3.10-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# نسخ البيئة الجاهزة
+COPY --from=builder /app/.venv /app/.venv
+
+
+# نسخ الكود (مرتب زي FastAPI)
+COPY ./services/bento /app
+COPY ./app /app/app
+
+# env
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH=/app
+
+EXPOSE 3000
+
+# تشغيل Bento
+CMD ["bentoml", "serve", "service:BratsService", "--port", "3000"]

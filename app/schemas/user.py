@@ -10,8 +10,8 @@ class UserBase(BaseModel):
         extra="forbid",
         validate_assignment=True,
     )
-    email: EmailStr | None = None
-    name: str | None = None
+    email: EmailStr 
+    name: str 
     created_at: datetime = Field(default_factory=datetime.now)
 
 

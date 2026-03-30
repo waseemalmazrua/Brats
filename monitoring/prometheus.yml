@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+
+  - job_name: "fastapi"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["fastapi:8080"]
+
+  - job_name: "bento"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["bento:3000"]

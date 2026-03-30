@@ -42,3 +42,7 @@ mlruns/
 # =========================
 output/
 outputs/
+uploads/
+
+docker-compose.dev.yml
+docker-compose.yml
