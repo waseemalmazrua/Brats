@@ -20,7 +20,7 @@ class Setting(BaseSettings):
     OPENAI_API_KEY: str
 
     model_config = SettingsConfigDict(
-        env_file=os.getenv("ENV_FILE", ".env"), env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
     )
 
 
