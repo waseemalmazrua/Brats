@@ -6,6 +6,8 @@ import "./index.css";
 
 const authParams = {
   redirect_uri: window.location.origin,
+  audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+  scope: "openid profile email",
 };
 
 // يضيف audience بس إذا موجود في .env

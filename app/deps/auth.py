@@ -20,8 +20,7 @@ def get_current_user(
             detail="Could not validate credentials",
         )
 
-    email_verified = claims.get("email_verified")
-    if email_verified is not email_verified and not None:
+    if claims.get("email_verified") is False:
         raise HTTPException(status_code=403, detail="Email not verified")
 
     user = db.query(User).filter(User.auth0_id == auth0_id).first()

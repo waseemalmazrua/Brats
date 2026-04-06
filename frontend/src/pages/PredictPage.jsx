@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ResultCard from "../components/ResultCard";
 
-const BACKEND = "http://127.0.0.1:8080";
+const BACKEND = "http://localhost:8082";
 const KEYS = ["t1", "t1ce", "t2", "flair"];
 const LABELS = { t1: "T1", t1ce: "T1CE", t2: "T2", flair: "FLAIR" };
 
@@ -22,15 +22,14 @@ function MedicalLoader() {
 
       <div style={ls.steps}>
         {[
-          { label: "Scan files uploaded", done: true },
-          { label: "Running BraTS 3D segmentation", active: true },
-          { label: "Generating AI clinical summary", done: false },
+          { label: "Files uploaded", done: true },
+          { label: "Running AI model", active: true },
+          { label: "Generating report", done: false },
         ].map(({ label, done, active }) => (
           <div key={label} style={ls.step}>
             <div style={{
               ...ls.dot,
               background: done ? "#111" : active ? "#555" : "#e0ddd8",
-              animation: active ? "pulse 1.2s ease-in-out infinite" : "none",
             }}/>
             <span style={{ ...ls.stepText, color: done ? "#111" : active ? "#555" : "#ccc" }}>
               {label}
@@ -73,13 +72,15 @@ export default function PredictPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [drag, setDrag] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [drag, setDrag] = useState(null);
 
   const allReady = KEYS.every((k) => files[k]);
   const remaining = KEYS.filter((k) => !files[k]).length;
 
-  const setFile = (key, file) => { if (file) setFiles((p) => ({ ...p, [key]: file })); };
+  const setFile = (key, file) => {
+    if (file) setFiles((p) => ({ ...p, [key]: file }));
+  };
 
   const handleDrop = (key, e) => {
     e.preventDefault(); setDrag(null);
@@ -92,18 +93,17 @@ export default function PredictPage() {
     try {
       const form = new FormData();
       KEYS.forEach((k) => form.append(k, files[k], files[k].name));
-      const up = await fetch(`${BACKEND}/upload/`, { method: "POST", body: form });
-      if (!up.ok) throw new Error(`Upload failed: ${up.status}`);
-      const { folder_path } = await up.json();
-      const pr = await fetch(`${BACKEND}/predict/`, {
+      const res = await fetch(`${BACKEND}/predict/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ folder_path, case_id: null }),
+        body: form,
       });
-      if (!pr.ok) throw new Error(`Prediction failed: ${pr.status}`);
-      setResult(await pr.json());
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+      if (!res.ok) throw new Error(`Prediction failed: ${res.status}`);
+      setResult(await res.json());
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const reset = () => {
@@ -121,7 +121,8 @@ export default function PredictPage() {
       <p style={s.sectionLabel}>MODALITY FILES</p>
       <div style={s.grid}>
         {KEYS.map((key) => (
-          <div key={key}
+          <div
+            key={key}
             style={{
               ...s.card,
               borderColor: drag === key ? "#111" : files[key] ? "#111" : "#e8e6e0",
@@ -139,9 +140,11 @@ export default function PredictPage() {
               {LABELS[key]}
             </span>
 
-            <input type="file" accept="*/*" id={`f-${key}`}
-              style={{ display: "none" }}
-              onChange={(e) => setFile(key, e.target.files[0])} />
+            <input
+              type="file" accept="*/*"
+              id={`f-${key}`} style={{ display: "none" }}
+              onChange={(e) => setFile(key, e.target.files[0])}
+            />
 
             <label htmlFor={`f-${key}`} style={{
               ...s.selBtn,
@@ -177,11 +180,15 @@ export default function PredictPage() {
       </div>
 
       <div style={s.actions}>
-        <button style={{
-          ...s.runBtn,
-          opacity: !allReady || loading ? 0.4 : 1,
-          cursor: !allReady || loading ? "not-allowed" : "pointer",
-        }} onClick={handleSubmit} disabled={!allReady || loading}>
+        <button
+          style={{
+            ...s.runBtn,
+            opacity: !allReady || loading ? 0.4 : 1,
+            cursor: !allReady || loading ? "not-allowed" : "pointer",
+          }}
+          onClick={handleSubmit}
+          disabled={!allReady || loading}
+        >
           RUN ANALYSIS
         </button>
 
@@ -190,7 +197,9 @@ export default function PredictPage() {
         )}
 
         {!allReady && (
-          <span style={s.hint}>{remaining} file{remaining > 1 ? "s" : ""} remaining</span>
+          <span style={s.hint}>
+            {remaining} file{remaining > 1 ? "s" : ""} remaining
+          </span>
         )}
       </div>
 
