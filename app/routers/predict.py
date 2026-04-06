@@ -1,15 +1,14 @@
 import base64
-import json
 import time
+import traceback
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
 import httpx
+from fastapi import APIRouter, File, HTTPException, UploadFile
+from prometheus_client import Counter, Histogram
 
 from app.core.config import settings
-from app.core.utils import explain_prediction
 from app.core.prediction_services import get_cached_prediction, set_cached_prediction
-
-from prometheus_client import Counter, Histogram
+from app.core.utils import explain_prediction
 
 router = APIRouter(prefix="/predict", tags=["predict"])
 
@@ -83,12 +82,10 @@ async def predict(
             "explanation": explanation
         }
 
-    except HTTPException:
-        raise
-
     except Exception as e:
-        prediction_errors.inc()
-        raise HTTPException(status_code=500, detail=str(e))
+            prediction_errors.inc()
+            print("❌ FastAPI Error:", traceback.format_exc())  # أضف هذا
+            raise HTTPException(status_code=500, detail=str(e))
 
     finally:
         duration = time.time() - start_time

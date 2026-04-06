@@ -1,6 +1,7 @@
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-import os
+
 class Setting(BaseSettings):
     DATABASE_URL: str
     ALGORITHM: str

@@ -1,10 +1,9 @@
 # app/core/modality_detector.py
 import re
 from pathlib import Path
-from typing import Dict, Optional
 
 # خريطة الـ patterns لكل modality - مرتبة من الأكثر تحديداً للأقل
-MODALITY_PATTERNS: Dict[str, list] = {
+MODALITY_PATTERNS: dict[str, list] = {
     "t1ce": [
         r"t1ce", r"t1_ce", r"t1\+c", r"t1c(?!e)",
         r"ce_t1", r"contrast", r"gad", r"post"
@@ -23,7 +22,7 @@ MODALITY_PATTERNS: Dict[str, list] = {
 }
 
 
-def detect_modality(filename: str) -> Optional[str]:
+def detect_modality(filename: str) -> str | None:
     """
     يتعرف على modality الملف من اسمه.
     يرجع: 't1' | 't1ce' | 't2' | 'flair' | None
@@ -42,7 +41,7 @@ def detect_modality(filename: str) -> Optional[str]:
     return None
 
 
-def detect_modalities_from_folder(folder_path: str) -> Dict[str, str]:
+def detect_modalities_from_folder(folder_path: str) -> dict[str, str]:
     """
     يمسح الـ folder ويرجع dict:
     { 't1': '/path/file_t1.nii', 't1ce': '...', 't2': '...', 'flair': '...' }
@@ -53,8 +52,8 @@ def detect_modalities_from_folder(folder_path: str) -> Dict[str, str]:
     if not nii_files:
         raise ValueError(f"لا توجد ملفات .nii أو .nii.gz في: {folder_path}")
 
-    detected: Dict[str, str] = {}
-    conflicts: Dict[str, list] = {}
+    detected: dict[str, str] = {}
+    conflicts: dict[str, list] = {}
 
     for f in nii_files:
         modality = detect_modality(f.name)
@@ -73,7 +72,7 @@ def detect_modalities_from_folder(folder_path: str) -> Dict[str, str]:
     return detected
 
 
-def validate_modalities(modalities: Dict[str, str]) -> None:
+def validate_modalities(modalities: dict[str, str]) -> None:
     """يتحقق أن الـ 4 modalities الأساسية موجودة"""
     required = {"t1", "t1ce", "t2", "flair"}
     missing = required - set(modalities.keys())

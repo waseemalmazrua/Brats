@@ -1,6 +1,8 @@
-from openai import OpenAI
-from app.core.config import settings
 import asyncio
+
+from openai import OpenAI
+
+from app.core.config import settings
 
 
 def get_client():

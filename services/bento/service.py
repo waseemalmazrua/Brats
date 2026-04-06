@@ -1,12 +1,13 @@
 import base64
-import bentoml
 import json
+import tempfile
+from pathlib import Path
+
+import bentoml
+import mlflow.pyfunc
 import nibabel as nib
 import numpy as np
-from pathlib import Path
 import torch
-import mlflow.pyfunc
-import tempfile
 
 from app.core.config import settings
 from app.schemas.models import OutputData
@@ -82,6 +83,11 @@ class BratsService:
 
                 seg_path = output_dir / f"{case_id}_segmentation.nii.gz"
                 nib.save(seg_img, seg_path)
+                
+                print("DEBUG TYPE:", type(clean_report))
+                # This will catch if clean_report itself is the problem
+                json.dumps(clean_report) 
+
 
                 return OutputData(
                     report=clean_report,

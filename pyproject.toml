@@ -51,6 +51,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 target-version = "py310"
+fix = true   # ✅ هنا مكانه الصحيح
 
 [tool.ruff.lint]
 select = [
@@ -64,8 +65,6 @@ select = [
 ignore = [
     "E501"
 ]
-
-fix = true
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]

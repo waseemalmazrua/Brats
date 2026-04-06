@@ -1,8 +1,9 @@
 import bentoml
-import mlflow.pyfunc
 import mlflow
+import mlflow.pyfunc
 
 from app.core.config import settings
+
 
 def export():
     print("loading model from mlflow...")

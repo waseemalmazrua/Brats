@@ -1,10 +1,11 @@
+from uuid import uuid4
+
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.security import verify_token
 from app.db.session import get_db
 from app.models.user import User
-from app.core.security import verify_token
-from uuid import uuid4
 
 
 def get_current_user(

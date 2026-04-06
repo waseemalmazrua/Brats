@@ -1,8 +1,13 @@
 import json
+import hashlib
+
 from app.core.redis_client import r
 
+
 def get_cache_key(data: dict) -> str:
-    return json.dumps(data, sort_keys=True)
+    # استخدم MD5 hash بدل JSON مباشرة لأن data تحتوي bytes
+    combined = b"".join(data.values())
+    return hashlib.md5(combined).hexdigest()
 
 
 def get_cached_prediction(data: dict):
