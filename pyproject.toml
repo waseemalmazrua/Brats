@@ -10,7 +10,7 @@ dependencies = [
     "bentoml>=1.4.36",
     "fastapi>=0.115.14",
     "httpx>=0.28.1",
-    "mlflow==3.10.0",
+    "mlflow==3.11.1",
     "monai>=1.5.2",
     "psycopg2-binary>=2.9.11",
     "pydantic[email]>=2.12.5",
@@ -27,6 +27,10 @@ dependencies = [
     "prometheus-client>=0.24.1",
     "redis>=7.4.0",
     "torch>=2.11.0",
+    "starlette>=0.52.1",
+    "cryptography>=46.0.7",
+    "aiohttp>=3.13.5",
+    "pyasn1>=0.6.3",
 ]
 [[tool.uv.index]]
 name = "pytorch-cpu"
