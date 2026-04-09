@@ -45,4 +45,4 @@ outputs/
 uploads/
 
 docker-compose.dev.yml
-docker-compose.yml
+docker-compose.ymlresult.json

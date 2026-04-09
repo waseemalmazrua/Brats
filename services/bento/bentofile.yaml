@@ -1,10 +1,2 @@
 service: "services.bento.service:BratsService"
 
-python:
-  packages:
-    - bentoml==1.4.36
-    - mlflow==3.10.1
-    - nibabel==5.4.2
-    - numpy
-    - torch
-    - monai
