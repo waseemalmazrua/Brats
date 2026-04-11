@@ -45,4 +45,8 @@ outputs/
 uploads/
 
 docker-compose.dev.yml
-docker-compose.ymlresult.json
+docker-compose.yml
+result.json
+install-scout.sh
+result.json
+index.html

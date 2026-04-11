@@ -33,12 +33,13 @@ def clean_bytes(obj):
 class BratsService:
 
     def __init__(self):
-        self.model = mlflow.pyfunc.load_model(settings.MLFLOW_MODEL_URI)
+        self.model = bentoml.models.get(settings.BENTO_MODEL_NAME).load_model()
+        # self.model = mlflow.pyfunc.load_model(settings.MLFLOW_MODEL_URI)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"🚀 Model running on: {self.device}")
 
     @bentoml.api()
-    def predict(self, t1: str, t1ce: str, t2: str, flair: str) -> OutputData:
+    async def predict(self, t1: str, t1ce: str, t2: str, flair: str) -> OutputData:
         try:
             with tempfile.TemporaryDirectory() as tmpdir:
                 tmp_path = Path(tmpdir)
