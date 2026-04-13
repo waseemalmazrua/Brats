@@ -1,5 +1,6 @@
 from app.models.user import User
 
+
 def test_get_me_creates_user(client, db, override_auth):
 
     response = client.get("/users/me")

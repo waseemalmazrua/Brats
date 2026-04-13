@@ -41,6 +41,6 @@ def get_current_user(
         except Exception as e:
             print(e)
             db.rollback()
-            raise HTTPException(status_code=500, detail="Could not create user")
+            raise HTTPException(status_code=500, detail="Could not create user") from e
 
     return user

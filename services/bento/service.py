@@ -4,7 +4,6 @@ import tempfile
 from pathlib import Path
 
 import bentoml
-import mlflow.pyfunc
 import nibabel as nib
 import numpy as np
 import torch

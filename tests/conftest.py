@@ -1,26 +1,20 @@
 import pytest
-from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
-from app.main import app
-from app.models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.db.base import Base
-from app.main import app
-from app.db.session import get_db
-from app.models.user import User
-from app.core.security import verify_token
 
-@pytest.fixture
-def client():
-    return TestClient(app)
+from app.core.security import verify_token
+from app.db.base import Base
+from app.db.session import get_db
+from app.main import app
+
 
 
 # ------------------------------------------------------------
 
 
-# SQLite in-memory DB
-SQLALCHEMY_DATABASE_URL = "postgresql://test:test@localhost:5433/test_db"
+
+SQLALCHEMY_DATABASE_URL = "postgresql://test:test@localhost:5436/test_db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
