@@ -26,7 +26,7 @@ jobs:
         run: uv run pytest               # ← uv run
 
       - name: Build FastAPI image
-        run: docker build -t fastapi .
+        run: docker build -t fastapi -f app/dockerfile . 
 
       - name: Build Bento image
         run: docker build -t bento ./services/bento
