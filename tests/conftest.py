@@ -7,13 +7,17 @@ from app.core.security import verify_token
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
-
+import os
 # ------------------------------------------------------------
 
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://test:test@localhost:5436/test_db"
+# tests/conftest.py
 
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://test:test@localhost:5436/test_db"  # fallback محلي
+)
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
 )
