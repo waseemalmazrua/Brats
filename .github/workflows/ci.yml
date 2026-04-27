@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4        # ← v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5    # ← v5
         with:
           python-version: '3.11'
 
@@ -23,7 +23,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Run tests
-        run: pytest
+        run: uv run pytest               # ← uv run
 
       - name: Build FastAPI image
         run: docker build -t fastapi .
