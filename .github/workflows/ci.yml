@@ -23,7 +23,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Run tests
-        run: uv run pytest               # ← uv run
+        run: uv run pytest tests/ -v              # ← uv run
 
       - name: Build FastAPI image
         run: docker build -t fastapi -f app/dockerfile . 
