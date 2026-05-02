@@ -46,8 +46,13 @@ jobs:
         run: uv run pytest tests/ -v
 
       - name: Stop test database
-        if: always()  # ← يوقفه حتى لو tests فشلت
+        if: always()
         run: docker compose -f docker-compose.test.yml down
+
+      - name: Run Migrations
+        run: uv run alembic upgrade head
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
 
       - name: Build FastAPI image
         run: docker build -t fastapi -f app/dockerfile .

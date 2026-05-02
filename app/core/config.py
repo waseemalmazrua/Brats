@@ -4,6 +4,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Setting(BaseSettings):
     DATABASE_URL: str
+    DATABASE_URL_PROD: str
+    IS_DEV: bool = True  
+    @property
+    def db_url(self) -> str:
+        return self.DATABASE_URL if self.IS_DEV else self.DATABASE_URL_PROD
+
     ALGORITHM: str
 
     AUTH0_DOMAIN: str
