@@ -137,25 +137,6 @@ Standard Cloud Run requests are limited to 32MB, which MRI NIfTI files easily ex
 
 ---
 
-## Local Development
-
-```bash
-# Clone and install dependencies
-git clone <repo>
-uv sync
-
-# Start all local services
-docker compose -f docker-compose.dev.yml up -d
-
-# Run database migrations
-alembic -c app/alembic.ini upgrade head
-
-# Start API server
-uvicorn app.main:app --reload --port 8082
-
-# Start BentoML inference service
-bentoml serve service:BratsService --port 3000
-```
 
 ---
 
