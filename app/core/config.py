@@ -27,7 +27,7 @@ class Setting(BaseSettings):
 
     OPENAI_API_KEY: str
 
-    ALLOW_ORIGIN: str
+    ALLOW_ORIGINS: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
