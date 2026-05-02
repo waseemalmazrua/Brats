@@ -33,6 +33,9 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: postgresql://test:test@localhost:5436/test_db
+          DATABASE_URL_PROD: postgresql://test:test@localhost:5436/test_db
+          IS_DEV: true
+          ALLOW_ORIGINS: http://localhost:5173
           ALGORITHM: HS256
           AUTH0_DOMAIN: test.auth0.com
           AUTH0_AUDIENCE: test-audience
@@ -53,6 +56,19 @@ jobs:
         run: uv run alembic -c app/alembic.ini upgrade head
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DATABASE_URL_PROD: ${{ secrets.DATABASE_URL_PROD }}
+          IS_DEV: false
+          ALLOW_ORIGINS: https://brats-3d.web.app
+          ALGORITHM: HS256
+          AUTH0_DOMAIN: placeholder
+          AUTH0_AUDIENCE: placeholder
+          MLFLOW_MODEL_URI: placeholder
+          BENTO_MODEL_NAME: placeholder
+          MLFLOW_TRACKING_URI: placeholder
+          BENTOML_MODEL_TAG: placeholder
+          BENTO_URL: placeholder
+          GOOGLE_APPLICATION_CREDENTIALS: '{}'
+          OPENAI_API_KEY: placeholder
 
       - name: Build FastAPI image
         run: docker build -t fastapi -f app/dockerfile .

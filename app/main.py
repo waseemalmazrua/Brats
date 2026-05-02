@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.routers import login, predict, users
+from app.core.config import settings
 
 app = FastAPI()
 
@@ -10,7 +11,7 @@ Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[settings.ALLOW_ORIGINS],
     allow_methods=["*"],
     allow_headers=["*"],
 )
