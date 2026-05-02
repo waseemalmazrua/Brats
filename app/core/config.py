@@ -1,10 +1,11 @@
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
 
 class Setting(BaseSettings):
     DATABASE_URL: str
-    DATABASE_URL_PROD: str
+    DATABASE_URL_PROD: Optional[str] = None
     IS_DEV: bool = True  
     @property
     def db_url(self) -> str:
