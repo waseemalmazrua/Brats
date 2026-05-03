@@ -37,7 +37,9 @@ COPY ./app /app/app
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-RUN python -c "
+ARG GCP_SA_KEY
+RUN echo "${GCP_SA_KEY}" > /tmp/sa_key.json && \
+    GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa_key.json python -c "
 from google.cloud import storage
 client = storage.Client()
 bucket = client.bucket('brats-uploads')
@@ -45,7 +47,7 @@ blob = bucket.blob('models/brats_model.bentomodel')
 blob.download_to_filename('/tmp/brats_model.bentomodel')
 " && \
     bentoml models import /tmp/brats_model.bentomodel && \
-    rm /tmp/brats_model.bentomodel
+    rm /tmp/brats_model.bentomodel /tmp/sa_key.json
 
 EXPOSE 3000
 

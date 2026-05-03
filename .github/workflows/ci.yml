@@ -85,7 +85,10 @@ jobs:
 
       - name: Build and Push Bento image
         run: |
-          docker build -t gcr.io/brats-488801/bento -f services/bento/dockerfile .
+          docker build \
+            --build-arg GCP_SA_KEY='${{ secrets.GCP_SA_KEY }}' \
+            -t gcr.io/brats-488801/bento \
+            -f services/bento/dockerfile .
           docker push gcr.io/brats-488801/bento
 
       - name: Deploy FastAPI to Cloud Run
@@ -96,6 +99,7 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --port 8080 \
+            --set-secrets "OPENAI_API_KEY=OPENAI_API_KEY:latest" \
             --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",ALLOW_ORIGINS="https://brats-3d.web.app",IS_DEV=false
 
       - name: Deploy Bento to Cloud Run
@@ -106,6 +110,8 @@ jobs:
             --region us-central1 \
             --allow-unauthenticated \
             --port 3000 \
+            --timeout 600 \
+            --memory 4Gi \
             --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",IS_DEV=false
 
       - name: Build Frontend
