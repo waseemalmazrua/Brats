@@ -1,4 +1,32 @@
-# Brats-3D — Brain Tumor MRI Analysis Platform
+<div align="center">
+
+# 🧠 Brats-3D — Brain Tumor MRI Analysis Platform
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=18&pause=1000&color=00B4D8&center=true&vCenter=true&width=500&lines=AI-Powered+Brain+Tumor+Segmentation;3D+UNet+%7C+BraTS2020+%7C+Full-Stack+MLOps" alt="Typing SVG" />
+
+<br/>
+
+![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![BentoML](https://img.shields.io/badge/BentoML-000000?style=for-the-badge&logo=bentoml&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+
+<br/>
+
+![Domain](https://img.shields.io/badge/Domain-Medical%20Imaging-red?style=flat-square)
+![Framework](https://img.shields.io/badge/Framework-3D%20UNet-blue?style=flat-square)
+![Dataset](https://img.shields.io/badge/Dataset-BraTS2020-orange?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Live%20%F0%9F%9F%A2-brightgreen?style=flat-square)
+![Live](https://img.shields.io/badge/Live-brats--3d.web.app-00B4D8?style=flat-square&logo=firebase)
+
+</div>
+
+---
+
 
 An end-to-end AI-powered clinical platform for automated brain tumor segmentation using multi-modal MRI scans, built on the BraTS2020 benchmark dataset. The system accepts four MRI modalities as input and returns a detailed segmentation report identifying tumor sub-regions with clinical significance.
 
