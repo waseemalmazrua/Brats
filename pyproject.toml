@@ -34,6 +34,7 @@ dependencies = [
     "ecdsa>=0.19.2",
     "jaraco-context>=6.1.2",
     "wheel>=0.46.3",
+    "google-cloud-secret-manager>=2.0.0"
 ]
 [[tool.uv.index]]
 name = "pytorch-cpu"

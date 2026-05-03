@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://brats-3d.web.app"],
+    "method": ["PUT", "GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

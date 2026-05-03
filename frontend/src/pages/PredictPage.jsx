@@ -1,11 +1,18 @@
 import { useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import ResultCard from "../components/ResultCard";
 
-const BACKEND = "http://localhost:8082";
+const BACKEND = import.meta.env.VITE_API_URL;
 const KEYS = ["t1", "t1ce", "t2", "flair"];
 const LABELS = { t1: "T1", t1ce: "T1CE", t2: "T2", flair: "FLAIR" };
 
-function MedicalLoader() {
+function MedicalLoader({ step }) {
+  const steps = [
+    { label: "Uploading files to storage", done: step > 0, active: step === 0 },
+    { label: "Running AI model", done: step > 1, active: step === 1 },
+    { label: "Generating report", done: step > 2, active: step === 2 },
+  ];
+
   return (
     <div style={ls.wrap}>
       <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
@@ -21,16 +28,9 @@ function MedicalLoader() {
       </svg>
 
       <div style={ls.steps}>
-        {[
-          { label: "Files uploaded", done: true },
-          { label: "Running AI model", active: true },
-          { label: "Generating report", done: false },
-        ].map(({ label, done, active }) => (
+        {steps.map(({ label, done, active }) => (
           <div key={label} style={ls.step}>
-            <div style={{
-              ...ls.dot,
-              background: done ? "#111" : active ? "#555" : "#e0ddd8",
-            }}/>
+            <div style={{ ...ls.dot, background: done ? "#111" : active ? "#555" : "#e0ddd8" }}/>
             <span style={{ ...ls.stepText, color: done ? "#111" : active ? "#555" : "#ccc" }}>
               {label}
             </span>
@@ -68,8 +68,10 @@ const ls = {
 };
 
 export default function PredictPage() {
+  const { getAccessTokenSilently } = useAuth0();
   const [files, setFiles] = useState({ t1: null, t1ce: null, t2: null, flair: null });
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -87,18 +89,55 @@ export default function PredictPage() {
     setFile(key, e.dataTransfer.files[0]);
   };
 
+  const uploadToGCS = async (token, modality, file) => {
+    // 1. احصل على signed URL
+    const res = await fetch(
+      `${BACKEND}/upload/signed-url?filename=${file.name}&modality=${modality}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("Failed to get signed URL");
+    const { url, gcs_path } = await res.json();
+
+    // 2. ارفع الملف مباشرة لـ GCS
+    const uploadRes = await fetch(url, {
+      method: "PUT",
+      body: file,
+      headers: { "Content-Type": "application/octet-stream" },
+    });
+    if (!uploadRes.ok) throw new Error(`Failed to upload ${modality}`);
+
+    return gcs_path;
+  };
+
   const handleSubmit = async () => {
     if (!allReady) return;
-    setLoading(true); setError(null); setResult(null);
+    setLoading(true); setError(null); setResult(null); setLoadingStep(0);
+
     try {
-      const form = new FormData();
-      KEYS.forEach((k) => form.append(k, files[k], files[k].name));
+      const token = await getAccessTokenSilently();
+
+      // رفع الملفات لـ GCS
+      setLoadingStep(0);
+      const gcsPaths = {};
+      for (const key of KEYS) {
+        gcsPaths[key] = await uploadToGCS(token, key, files[key]);
+      }
+
+      // إرسال الـ paths للـ FastAPI
+      setLoadingStep(1);
       const res = await fetch(`${BACKEND}/predict/`, {
         method: "POST",
-        body: form,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(gcsPaths),
       });
+
+      setLoadingStep(2);
       if (!res.ok) throw new Error(`Prediction failed: ${res.status}`);
       setResult(await res.json());
+
     } catch (e) {
       setError(e.message);
     } finally {
@@ -203,7 +242,7 @@ export default function PredictPage() {
         )}
       </div>
 
-      {loading && <MedicalLoader />}
+      {loading && <MedicalLoader step={loadingStep} />}
       {error && <div style={s.errorBox}>{error}</div>}
       {result && <ResultCard result={result} />}
     </div>

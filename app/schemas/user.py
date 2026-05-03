@@ -16,9 +16,6 @@ class UserBase(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now)
 
 
-# class UserCreate(UserBase):
-#         auth0_id : str
-
 
 class UserResponse(UserBase):
     id: UUID

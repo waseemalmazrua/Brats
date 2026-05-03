@@ -1,4 +1,3 @@
-import base64
 import json
 import tempfile
 from pathlib import Path
@@ -7,6 +6,7 @@ import bentoml
 import nibabel as nib
 import numpy as np
 import torch
+from google.cloud import storage
 
 from app.core.config import settings
 from app.schemas.models import OutputData
@@ -28,12 +28,23 @@ def clean_bytes(obj):
     return obj
 
 
-@bentoml.service(traffic={"timeout": 300})
+def download_from_gcs(gcs_path: str, local_path: Path):
+    """يحمّل ملف من GCS لمسار محلي"""
+    # gcs_path = gs://brats-uploads/uploads/filename.nii
+    client = storage.Client()
+    path = gcs_path.replace("gs://", "")
+    bucket_name = path.split("/")[0]
+    blob_name = "/".join(path.split("/")[1:])
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+    blob.download_to_filename(str(local_path))
+
+
+@bentoml.service(traffic={"timeout": 500})
 class BratsService:
 
     def __init__(self):
         self.model = bentoml.models.get(settings.BENTO_MODEL_NAME).load_model()
-        # self.model = mlflow.pyfunc.load_model(settings.MLFLOW_MODEL_URI)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"🚀 Model running on: {self.device}")
 
@@ -48,10 +59,10 @@ class BratsService:
                 t2_path = tmp_path / "t2.nii"
                 flair_path = tmp_path / "flair.nii"
 
-                t1_path.write_bytes(base64.b64decode(t1))
-                t1ce_path.write_bytes(base64.b64decode(t1ce))
-                t2_path.write_bytes(base64.b64decode(t2))
-                flair_path.write_bytes(base64.b64decode(flair))
+                download_from_gcs(t1, t1_path)
+                download_from_gcs(t1ce, t1ce_path)
+                download_from_gcs(t2, t2_path)
+                download_from_gcs(flair, flair_path)
 
                 print(f"✅ t1: {t1_path.stat().st_size} bytes")
                 print(f"✅ t1ce: {t1ce_path.stat().st_size} bytes")
@@ -83,11 +94,6 @@ class BratsService:
 
                 seg_path = output_dir / f"{case_id}_segmentation.nii.gz"
                 nib.save(seg_img, seg_path)
-                
-                print("DEBUG TYPE:", type(clean_report))
-                # This will catch if clean_report itself is the problem
-                json.dumps(clean_report) 
-
 
                 return OutputData(
                     report=clean_report,

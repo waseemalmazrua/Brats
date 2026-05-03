@@ -1,9 +1,9 @@
-import base64
 import time
 import traceback
 
 import httpx
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from prometheus_client import Counter, Histogram
 
 from app.core.config import settings
@@ -19,6 +19,13 @@ prediction_errors = Counter("prediction_errors_total", "Total number of predicti
 prediction_latency = Histogram("prediction_latency_seconds", "Time spent on prediction endpoint")
 
 
+class PredictRequest(BaseModel):
+    t1: str
+    t1ce: str
+    t2: str
+    flair: str
+
+
 def clean_json(obj):
     if isinstance(obj, bytes):
         return obj.decode("utf-8")
@@ -30,36 +37,24 @@ def clean_json(obj):
 
 
 @router.post("/")
-async def predict(
-    t1: UploadFile = File(...),
-    t1ce: UploadFile = File(...),
-    t2: UploadFile = File(...),
-    flair: UploadFile = File(...)
-):
+async def predict(request: PredictRequest):
     prediction_counter.inc()
     start_time = time.time()
 
     try:
-        files_bytes = {
-            "t1": await t1.read(),
-            "t1ce": await t1ce.read(),
-            "t2": await t2.read(),
-            "flair": await flair.read(),
-        }
-
-        cached = get_cached_prediction(files_bytes)
+        cache_key = request.model_dump()
+        cached = get_cached_prediction(cache_key)
         if cached:
             result = cached
         else:
-            # encode كـ base64
             payload = {
-                "t1": base64.b64encode(files_bytes["t1"]).decode("utf-8"),
-                "t1ce": base64.b64encode(files_bytes["t1ce"]).decode("utf-8"),
-                "t2": base64.b64encode(files_bytes["t2"]).decode("utf-8"),
-                "flair": base64.b64encode(files_bytes["flair"]).decode("utf-8"),
+                "t1": request.t1,
+                "t1ce": request.t1ce,
+                "t2": request.t2,
+                "flair": request.flair,
             }
 
-            async with httpx.AsyncClient(timeout=300) as client:
+            async with httpx.AsyncClient(timeout=3600) as client:
                 response = await client.post(
                     f"{BENTO_URL}/predict",
                     json=payload
@@ -73,19 +68,15 @@ async def predict(
                 )
 
             result = clean_json(response.json())
-            set_cached_prediction(files_bytes, result)
+            set_cached_prediction(cache_key, result)
 
         explanation = await explain_prediction(result)
-
-        return {
-            "prediction": result,
-            "explanation": explanation
-        }
+        return {"prediction": result, "explanation": explanation}
 
     except Exception as e:
-            prediction_errors.inc()
-            print("❌ FastAPI Error:", traceback.format_exc())  # أضف هذا
-            raise HTTPException(status_code=500, detail=str(e))
+        prediction_errors.inc()
+        print("❌ FastAPI Error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
 
     finally:
         duration = time.time() - start_time

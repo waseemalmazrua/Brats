@@ -70,8 +70,58 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: '{}'
           OPENAI_API_KEY: placeholder
 
-      - name: Build FastAPI image
-        run: docker build -t fastapi -f app/dockerfile .
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Build Bento image
-        run: docker build -t bento -f services/bento/dockerfile .
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push FastAPI image
+        run: |
+          docker build -t gcr.io/brats-488801/fastapi -f app/dockerfile .
+          docker push gcr.io/brats-488801/fastapi
+
+      - name: Build and Push Bento image
+        run: |
+          docker build -t gcr.io/brats-488801/bento -f services/bento/dockerfile .
+          docker push gcr.io/brats-488801/bento
+
+      - name: Deploy FastAPI to Cloud Run
+        run: |
+          gcloud run deploy fastapi \
+            --image gcr.io/brats-488801/fastapi \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --port 8080 \
+            --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",ALLOW_ORIGINS="https://brats-3d.web.app",IS_DEV=false
+
+      - name: Deploy Bento to Cloud Run
+        run: |
+          gcloud run deploy bento \
+            --image gcr.io/brats-488801/bento \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --port 3000 \
+            --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",IS_DEV=false
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_BENTO_URL: ${{ secrets.VITE_BENTO_URL }}
+          VITE_AUTH0_DOMAIN: ${{ secrets.VITE_AUTH0_DOMAIN }}
+          VITE_AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
+
+      - name: Deploy Frontend to Firebase
+        run: |
+          npm install -g firebase-tools
+          cd frontend
+          firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}

@@ -4,10 +4,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.routers import login, predict, users
 from app.core.config import settings
-
+from app.routers import upload
 app = FastAPI()
-
-Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +22,7 @@ def health_check():
 app.include_router(users.router)
 app.include_router(login.router)
 app.include_router(predict.router)
+app.include_router(upload.router)
 # app.include_router(upload.router)
 
 # Base.metadata.create_all(bind=engine)

@@ -50,3 +50,5 @@ result.json
 install-scout.sh
 result.json
 index.html
+# في .gitignore
+services/bento/brats_model.bentomodel
