@@ -34,13 +34,18 @@ COPY --from=builder /app/.venv /app/.venv
 COPY ./services/bento /app
 COPY ./app /app/app
 
-# import الموديل داخل الصورة
-COPY ./services/bento/brats_model.bentomodel /tmp/brats_model.bentomodel
-RUN /app/.venv/bin/bentoml models import /tmp/brats_model.bentomodel && \
-    rm /tmp/brats_model.bentomodel
-
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
+
+RUN python -c "
+from google.cloud import storage
+client = storage.Client()
+bucket = client.bucket('brats-uploads')
+blob = bucket.blob('models/brats_model.bentomodel')
+blob.download_to_filename('/tmp/brats_model.bentomodel')
+" && \
+    bentoml models import /tmp/brats_model.bentomodel && \
+    rm /tmp/brats_model.bentomodel
 
 EXPOSE 3000
 
