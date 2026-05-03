@@ -39,7 +39,7 @@ ENV PYTHONPATH=/app
 
 ARG GCP_SA_KEY
 COPY ./services/bento/download_model.py /tmp/download_model.py
-RUN echo "${GCP_SA_KEY}" > /tmp/sa_key.json && \
+RUN printf '%s' "${GCP_SA_KEY}" > /tmp/sa_key.json && \
     GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa_key.json python /tmp/download_model.py && \
     bentoml models import /tmp/brats_model.bentomodel && \
     rm /tmp/brats_model.bentomodel /tmp/sa_key.json /tmp/download_model.py
