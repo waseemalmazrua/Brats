@@ -112,7 +112,7 @@ jobs:
             --port 3000 \
             --timeout 600 \
             --memory 4Gi \
-            --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",IS_DEV=false
+            --set-env-vars DATABASE_URL="${{ secrets.DATABASE_URL_PROD }}",ALGORITHM="RS256",AUTH0_DOMAIN="${{ secrets.VITE_AUTH0_DOMAIN }}",AUTH0_AUDIENCE="${{ secrets.VITE_AUTH0_AUDIENCE }}",ALLOW_ORIGINS="https://brats-3d.web.app",IS_DEV=false
 
       - name: Build Frontend
         run: |
