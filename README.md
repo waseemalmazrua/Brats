@@ -26,7 +26,7 @@
 </div>
 
 ---
-
+link : https://brats-3d.web.app/
 
 An end-to-end AI-powered clinical platform for automated brain tumor segmentation using multi-modal MRI scans, built on the BraTS2020 benchmark dataset. The system accepts four MRI modalities as input and returns a detailed segmentation report identifying tumor sub-regions with clinical significance.
 
